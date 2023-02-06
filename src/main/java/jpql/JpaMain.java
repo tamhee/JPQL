@@ -37,10 +37,36 @@ public class JpaMain {
             // Spring Data JPA -> null이나 Optional 반환하도록 되어 있음.
 //          Member singleResult = query1.getSingleResult();
 
-            Member result = em.createQuery("select m from Member m where m.username = :username", Member.class)
-                        .setParameter("username", "test")
-                        .getSingleResult();
-            System.out.println("singleResult = " + result.getUsername());
+//            Member result = em.createQuery("select m from Member m where m.username = :username", Member.class)
+//                        .setParameter("username", "test")
+//                        .getSingleResult();
+//            System.out.println("singleResult = " + result.getUsername());
+
+            // 프로젝션 - 여러값 조회
+            //1.  Object -> Object [] 다운 캐스팅
+//            List resultList = em.createQuery("select distinct m.username, m.age From Member m")
+//                    .getResultList();
+//
+//            Object o = resultList.get(0);
+//            Object[] result = (Object[]) o;
+//            System.out.println("result = " + result[0]);
+//            System.out.println("result = " + result[1]);
+            //2 . 제네릭 타입을 Object [] 로 지정
+//            List<Object[]> resultList = em.createQuery("select distinct m.username, m.age From Member m")
+//                    .getResultList();
+//
+//            Object [] result = resultList.get(0);
+//            System.out.println("result = " + result[0]);
+//            System.out.println("result = " + result[1]);
+
+            // qlString이 문자기 때문에 패키지명을 모두 적어줘야 함.
+//          QueryDSL에서 패키지 명을 포함한 전체 클래스명 입력하는 문제 극복 가능
+            List<MemberDTO> result = em.createQuery("select new com.jpql.MemberDTO(m.username, m.age) From Member m", MemberDTO.class)
+                    .getResultList();
+
+            MemberDTO memberDTO = result.get(0);
+            System.out.println("memberDTO = " + memberDTO.getUsername());
+            System.out.println("memberDTO = " + memberDTO.getAge());
 
             tx.commit();;
         } catch(Exception e){

@@ -14,13 +14,17 @@ public class JpaMain {
         tx.begin();
 
         try{
+            Team team = new Team();
+            team.setName("teamA");
+            em.persist(team);
 
-            for(int i = 0; i<100; i++){
-                Member member = new Member();
-                member.setUsername("member"+ i);
-                member.setAge(i);
-                em.persist(member);
-            }
+            Member member = new Member();
+            member.setUsername("member1");
+            member.setAge(10);
+
+            member.setTeam(team);
+             em.persist(member);
+
 
 
             // 반환타입이 명확할 때 TypedQuery
@@ -73,15 +77,36 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
-                    .setFirstResult(0)
-                    .setMaxResults(20)
+            //페이징
+//            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
+//                    .setFirstResult(0)
+//                    .setMaxResults(20)
+//                    .getResultList();
+//
+//            System.out.println("result.size = " + resultList.size());
+//            for(Member member1 : resultList){
+//                System.out.println("member1 = " + member1);
+//            }
+
+            // 내부조인
+            //String query = "select m from Member m inner join m.team t";
+            //외부조인
+            //String query = "select m from Member m left join m.team t";
+            //세타조인
+            //String query = "select m from Member m, Team t where m.username = t.name";
+            //List<Member> resultList = em.createQuery(query, Member.class)
+            //        .getResultList();
+
+            // 조인 필터링
+//            String query = "select m from Member m left join m.team t on t.name  = 'teamA'";
+//            List<Member> resultList = em.createQuery(query, Member.class)
+//                    .getResultList();
+
+            // 연관관계 없는 엔티티 외부조인
+            String query = "select m from Member m left join Team t  on m.username = t.name";
+            List<Member> resultList = em.createQuery(query, Member.class)
                     .getResultList();
 
-            System.out.println("result.size = " + resultList.size());
-            for(Member member1 : resultList){
-                System.out.println("member1 = " + member1);
-            }
 
             tx.commit();;
         } catch(Exception e){

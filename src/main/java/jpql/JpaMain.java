@@ -103,10 +103,29 @@ public class JpaMain {
 //                    .getResultList();
 
             // 연관관계 없는 엔티티 외부조인
-            String query = "select m from Member m left join Team t  on m.username = t.name";
-            List<Member> resultList = em.createQuery(query, Member.class)
-                    .getResultList();
+//            String query = "select m from Member m left join Team t  on m.username = t.name";
+//            List<Member> resultList = em.createQuery(query, Member.class)
+//                    .getResultList();
 
+
+            // 조건식
+//            String query = "select " +
+//                                "case when m.age <= 10 then '학생요금' " +
+//                                "     when m.age >= 60 then '경로요금' " +
+//                                "     else '일반요금' " +
+//                                "end " +
+//                            "from Member m";
+
+            // coalesce : 하나씩 조회해서 null 이 아니면 반환
+            //String query = "select coalesce(m.username, '이름 없는 회원') from Member m";
+
+            // nullif : 두 값이 같으면 null 반환, 다르면 첫번째 값 반환
+            String query = "select nullif(m.username, 'member1') from Member m";
+            List<String> resultList = em.createQuery(query, String.class).getResultList();
+
+            for(String s : resultList){
+                System.out.println("s = " + s);
+            }
 
             tx.commit();;
         } catch(Exception e){

@@ -15,11 +15,13 @@ public class JpaMain {
 
         try{
 
+            for(int i = 0; i<100; i++){
+                Member member = new Member();
+                member.setUsername("member"+ i);
+                member.setAge(i);
+                em.persist(member);
+            }
 
-            Member member = new Member();
-            member.setUsername("test");
-            member.setAge(10);
-            em.persist(member);
 
             // 반환타입이 명확할 때 TypedQuery
             // 반환타입이 명확하지 않을때 Query
@@ -61,12 +63,25 @@ public class JpaMain {
 
             // qlString이 문자기 때문에 패키지명을 모두 적어줘야 함.
 //          QueryDSL에서 패키지 명을 포함한 전체 클래스명 입력하는 문제 극복 가능
-            List<MemberDTO> result = em.createQuery("select new com.jpql.MemberDTO(m.username, m.age) From Member m", MemberDTO.class)
+//            List<MemberDTO> result = em.createQuery("select new com.jpql.MemberDTO(m.username, m.age) From Member m", MemberDTO.class)
+//                    .getResultList();
+//
+//            MemberDTO memberDTO = result.get(0);
+//            System.out.println("memberDTO = " + memberDTO.getUsername());
+//            System.out.println("memberDTO = " + memberDTO.getAge());
+
+            em.flush();
+            em.clear();
+
+            List<Member> resultList = em.createQuery("select m from Member m order by m.age desc", Member.class)
+                    .setFirstResult(0)
+                    .setMaxResults(20)
                     .getResultList();
 
-            MemberDTO memberDTO = result.get(0);
-            System.out.println("memberDTO = " + memberDTO.getUsername());
-            System.out.println("memberDTO = " + memberDTO.getAge());
+            System.out.println("result.size = " + resultList.size());
+            for(Member member1 : resultList){
+                System.out.println("member1 = " + member1);
+            }
 
             tx.commit();;
         } catch(Exception e){
